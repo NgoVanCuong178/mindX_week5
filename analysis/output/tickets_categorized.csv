@@ -1,0 +1,132 @@
+﻿ticket,stage,priority,category_code,category,matched_by,reporter,tag_count,tags
+325,New,High priority,reward,Điểm thưởng / đổi quà,tiêu đề: doi qua,User-001,1,E-learning
+287,New,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: thanh toan,User-002,2,CRM; Vấn đề thanh toán
+296,New,Low priority,reward,Điểm thưởng / đổi quà,tiêu đề: doi qua,User-003,2,LMS; Điểm thưởng
+278,New,Low priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: giao dich,User-004,2,CRM; Xóa payment
+249,New,Low priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: confirm,User-004,2,CRM; Xóa payment
+58,New,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-005,1,CRM
+308,First Response Sent,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: cap lai tai khoan,User-006,2,User responded; Xspace
+288,First Response Sent,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-007,2,CRM; Đổi tên HV trong order
+286,First Response Sent,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-007,2,CRM; Đổi tên HV trong order
+280,First Response Sent,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: compass,User-008,3,Awaiting information; Compass; kiểm tra thông tin lớp học
+275,First Response Sent,Urgent,crm,CRM / lead / cuộc gọi,tiêu đề: crm,User-009,3,CRM; User responded; sms
+129,First Response Sent,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: cap lai mail,User-010,1,Các vấn đề về mail
+104,First Response Sent,Urgent,reward,Điểm thưởng / đổi quà,tiêu đề: doi qua,User-003,3,LMS; User responded; Điểm thưởng
+336,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: dropout,User-011,1,CRM
+335,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: dropout,User-012,1,LMS
+324,First Response Sent,High priority,crm,CRM / lead / cuộc gọi,tiêu đề: crm,User-013,2,CRM; LMS
+315,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,thẻ: enroll hv,User-014,3,LMS; User responded; enroll HV
+302,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: add hoc vien,User-015,3,LMS; User responded; enroll HV
+224,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-016,4,CRM; LMS; User responded; enroll HV
+222,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: lop,User-017,2,Denise; Tài khoản Denise - HV không đăng nhập được
+201,First Response Sent,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: lop,User-018,2,LMS; Điều chỉnh buổi học
+140,First Response Sent,High priority,crm,CRM / lead / cuộc gọi,thẻ: chuyen trang thai lead,User-009,2,CRM; Chuyển trạng thái lead
+294,First Response Sent,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: ho tro tai khoan,User-017,2,Denise; Tài khoản Denise - HV không đăng nhập được
+75,In Progress,Urgent,crm,CRM / lead / cuộc gọi,tiêu đề: lead,User-019,3,Bug; CRM; assign lead
+60,In Progress,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-007,2,LMS; enroll HV
+153,In Progress,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: fix oder,User-020,2,CRM; fix giá
+158,In Progress,Low priority,room,Đặt phòng / Crystal,tiêu đề: crystal,User-021,2,Bug; LMS
+157,In Progress,Low priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-021,3,Bug; E-contract; Hợp đồng sai thông tin
+305,Resolved,Urgent,payment,Thanh toán / payment / hoá đơn,tiêu đề: confirm,User-022,3,Awaiting information; Bug; Vấn đề thanh toán
+295,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: bu cong,User-003,2,LMS; Điểm thưởng
+291,Resolved,Urgent,tms,TMS / chấm công giáo viên,thẻ: bang cong giao vien,User-023,2,Awaiting information; Bảng công giáo viên
+290,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: lop,User-023,2,LMS; kiểm tra thông tin lớp học
+284,Resolved,Urgent,crm,CRM / lead / cuộc gọi,tiêu đề: crm,User-024,2,CRM; Các vấn đề về mail
+276,Resolved,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: chuyen tai khoan,User-025,2,CRM; LMS
+274,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-026,1,LMS
+269,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: trang thai hoc vien,User-027,1,LMS
+267,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-026,1,CRM
+260,Resolved,Urgent,crm,CRM / lead / cuộc gọi,tiêu đề: crm,User-009,1,CRM
+254,Resolved,Urgent,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-028,2,CRM; E-contract
+248,Resolved,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: cap tai khoan,User-029,2,CRM; LMS
+247,Resolved,Urgent,payment,Thanh toán / payment / hoá đơn,tiêu đề: dong tien,User-030,1,CRM
+241,Resolved,Urgent,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: khong truy cap,User-031,0,
+239,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-032,1,TMS
+237,Resolved,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: chuyen crm cho nhan su,User-033,1,CRM
+236,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-034,1,TMS
+234,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-035,1,TMS
+232,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-036,1,TMS
+230,Resolved,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: cap mail,User-037,1,Các vấn đề về mail
+228,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-038,1,TMS
+226,Resolved,Urgent,payment,Thanh toán / payment / hoá đơn,tiêu đề: payment,User-039,1,CRM
+225,Resolved,Urgent,payment,Thanh toán / payment / hoá đơn,tiêu đề: patment,User-040,0,
+218,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: cham cong,User-026,0,
+215,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-041,0,
+210,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-042,0,
+209,Resolved,Urgent,enroll,Ghi danh / lớp học / điểm danh,"tiêu đề: ^[a-z]{2,4}-[a-z0-9]+-[a-z0-9]+$",User-043,0,
+206,Resolved,Urgent,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-044,0,
+189,Resolved,Urgent,crm,CRM / lead / cuộc gọi,tiêu đề: sale,User-045,0,
+174,Resolved,Urgent,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: cap mail,User-037,1,Các vấn đề về mail
+172,Resolved,Urgent,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: mat khau,User-046,1,Các vấn đề về mail
+331,Resolved,High priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: khong vao duoc,User-017,1,Xspace
+268,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: hoc phan,User-047,1,LMS
+255,Resolved,High priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: tai khoan loi,User-017,2,Denise; Tài khoản Denise - HV không đăng nhập được
+238,Resolved,High priority,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-048,1,TMS
+231,Resolved,High priority,tms,TMS / chấm công giáo viên,tiêu đề: cham cong,User-049,1,TMS
+227,Resolved,High priority,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-050,1,TMS
+220,Resolved,High priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: bi khoa,User-051,0,
+219,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: them giup,User-047,0,
+211,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: diem danh,User-052,0,
+207,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: buoi demo,User-053,0,
+203,Resolved,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: upsale,User-028,0,
+194,Resolved,High priority,tms,TMS / chấm công giáo viên,tiêu đề: cham cong,User-054,0,
+187,Resolved,High priority,crm,CRM / lead / cuộc gọi,tiêu đề: lead,User-055,0,
+186,Resolved,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: payment,User-056,0,
+179,Resolved,High priority,room,Đặt phòng / Crystal,tiêu đề: book duoc phong,User-057,0,
+175,Resolved,High priority,other,Khác,-,User-058,0,
+173,Resolved,High priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-059,0,
+165,Resolved,High priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: dang nhap,User-060,0,
+152,Resolved,High priority,tms,TMS / chấm công giáo viên,tiêu đề: cham cong,User-054,0,
+150,Resolved,High priority,crm,CRM / lead / cuộc gọi,tiêu đề: lead,User-022,0,
+135,Resolved,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: confirm,User-022,0,
+125,Resolved,High priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: payment,User-056,0,
+87,Resolved,High priority,reward,Điểm thưởng / đổi quà,tiêu đề: diem thuong,User-061,0,
+72,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: dropout,User-011,0,
+63,Resolved,High priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-062,0,
+54,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-063,0,
+47,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-016,0,
+46,Resolved,High priority,crm,CRM / lead / cuộc gọi,tiêu đề: lead,User-064,0,
+37,Resolved,High priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: vao lop,User-023,0,
+05,Resolved,High priority,crm,CRM / lead / cuộc gọi,tiêu đề: cuoc goi,User-065,0,
+245,Resolved,Medium priority,crm,CRM / lead / cuộc gọi,tiêu đề: lead,User-066,1,CRM
+176,Resolved,Medium priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: compass,User-016,0,
+124,Resolved,Medium priority,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-067,0,
+99,Resolved,Medium priority,room,Đặt phòng / Crystal,tiêu đề: book duoc phong,User-068,0,
+62,Resolved,Medium priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: drop out,User-068,0,
+61,Resolved,Medium priority,enroll,Ghi danh / lớp học / điểm danh,"tiêu đề: ^[a-z]{2,4}-[a-z0-9]+-[a-z0-9]+$",User-016,0,
+41,Resolved,Medium priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: mat khau,User-069,0,
+39,Resolved,Medium priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: slot,User-070,0,
+318,Resolved,Low priority,crm,CRM / lead / cuộc gọi,tiêu đề: crm,User-009,3,Awaiting information; CRM; Check lỗi call
+297,Resolved,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: lop,User-003,1,LMS
+265,Resolved,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: mat khau,User-071,0,
+259,Resolved,Low priority,account,"Cấp / chuyển tài khoản, email công việc",tiêu đề: bo sung email,User-072,2,Awaiting information; kiểm tra thông tin tài khoản
+253,Resolved,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: dang nhap,User-071,0,
+246,Resolved,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-073,1,LMS
+243,Resolved,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-073,2,CRM; LMS
+235,Resolved,Low priority,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-074,1,TMS
+233,Resolved,Low priority,tms,TMS / chấm công giáo viên,tiêu đề: tms,User-035,0,
+229,Resolved,Low priority,other,Khác,-,User-070,1,Xspace
+221,Resolved,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-075,0,
+162,Resolved,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: dang nhap,User-021,0,
+161,Resolved,Low priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-021,1,E-contract
+159,Resolved,Low priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: ma giam gia,User-021,0,
+156,Resolved,Low priority,room,Đặt phòng / Crystal,tiêu đề: add duoc phong,User-021,0,
+155,Resolved,Low priority,payment,Thanh toán / payment / hoá đơn,tiêu đề: hoa don,User-021,0,
+145,Resolved,Low priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-021,1,Bug
+143,Resolved,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: dang nhap,User-021,0,
+141,Resolved,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: ho tro tai khoan,User-021,0,
+134,Resolved,Low priority,crm,CRM / lead / cuộc gọi,tiêu đề: order,User-076,0,
+101,Resolved,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: ten hv,User-016,0,
+42,Resolved,Low priority,contract,Hợp đồng / E-contract,tiêu đề: hop dong,User-055,0,
+310,Cancelled,Medium priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-005,0,
+312,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-005,0,
+309,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-005,0,
+138,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-021,0,
+137,Cancelled,Low priority,login,Đăng nhập / mật khẩu / tài khoản bị khoá,tiêu đề: user activation,User-021,0,
+136,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-021,0,
+57,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btech test\b,User-005,0,
+26,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btest ticket\b,User-005,0,
+25,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: \btest ticket\b,User-005,0,
+20,Cancelled,Low priority,mail,Email / SMS / thông báo,tiêu đề: mail,User-077,0,
+19,Cancelled,Low priority,test,Ticket test / thử hệ thống,tiêu đề: ^test$,User-078,0,
+06,Cancelled,Low priority,enroll,Ghi danh / lớp học / điểm danh,tiêu đề: enroll,User-034,0,

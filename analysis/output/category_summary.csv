@@ -1,0 +1,12 @@
+﻿category_code,category,tickets,users,untagged,urgent_high,share_pct,est_minutes_per_ticket,est_total_hours,automation_fit
+enroll,Ghi danh / lớp học / điểm danh,35,24,16,25,28.9,15.0,8.8,Trung bình - thao tác lặp lại nhưng nhiều trường hợp đặc biệt
+tms,TMS / chấm công giáo viên,18,16,7,15,14.9,30.0,9.0,"Thấp - lỗi hệ thống/dữ liệu, cần dev"
+crm,CRM / lead / cuộc gọi,14,11,6,11,11.6,15.0,3.5,Trung bình - chuyển trạng thái lead theo quy tắc
+payment,Thanh toán / payment / hoá đơn,14,10,7,10,11.6,15.0,3.5,"Thấp - thao tác tài chính, cần kế toán duyệt"
+login,Đăng nhập / mật khẩu / tài khoản bị khoá,14,8,10,6,11.6,7.5,1.8,"Cao - quy trình cố định: kiểm tra HR, kích hoạt lại, đặt lại mật khẩu"
+account,"Cấp / chuyển tài khoản, email công việc",8,7,0,7,6.6,10.0,1.3,"Trung bình - cấp tài khoản theo dữ liệu HR, cần duyệt"
+contract,Hợp đồng / E-contract,7,5,3,3,5.8,20.0,2.3,Thấp - cần kiểm tra thủ công
+reward,Điểm thưởng / đổi quà,4,3,1,3,3.3,30.0,2.0,"Thấp - đối soát giữa 2 hệ thống, cần dev/dữ liệu"
+room,Đặt phòng / Crystal,4,3,3,1,3.3,10.0,0.7,"Thấp - lỗi phần mềm đặt phòng, cần dev"
+other,Khác,2,2,1,1,1.7,15.0,0.5,-
+mail,Email / SMS / thông báo,1,1,1,0,0.8,10.0,0.2,Trung bình - cấp lại mail theo mẫu

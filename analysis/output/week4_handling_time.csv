@@ -1,0 +1,13 @@
+﻿ticket,priority,category,created,closed,elapsed_hours
+00005,Khẩn cấp,S3 Exam outage (Expedite),2026-10-10 22:19:18,2026-10-10 22:55:48,0.61
+00006,Khẩn cấp,S3 Exam outage - liên quan,2026-10-10 22:31:27,2026-10-15 05:58:41,103.45
+00007,Khẩn cấp,S3 Exam outage - liên quan,2026-10-10 22:35:28,2026-10-15 06:01:30,103.43
+00004,Mức độ ưu tiên cao,S2 Performance (Priority),2026-10-10 21:23:26,2026-10-10 21:55:34,0.54
+00010,Mức độ ưu tiên cao,S5 Video (Priority),2026-10-11 01:22:44,2026-10-11 01:47:11,0.41
+00011,Mức độ ưu tiên cao,S5 Video - liên quan,2026-10-11 01:26:03,2026-10-15 06:09:30,100.72
+00012,Mức độ ưu tiên cao,S5 Video - liên quan,2026-10-11 01:28:18,2026-10-15 06:11:47,100.72
+00013,Mức độ ưu tiên cao,S6 Deadline report (Fixed Deadline),2026-10-11 01:59:46,2026-10-11 02:15:06,0.26
+00001,Ưu tiên trung bình,S1 Login (Standard),2026-10-09 17:05:41,2026-10-10 16:40:57,23.59
+00002,Ưu tiên trung bình,S1 Login (Standard),2026-10-10 17:19:36,2026-10-10 17:35:18,0.26
+00003,Ưu tiên trung bình,S1 Login (Standard),2026-10-10 17:38:15,2026-10-10 17:48:22,0.17
+00009,Ưu tiên trung bình,S4 Feature request (Standard),2026-10-10 23:24:54,2026-10-11 00:23:28,0.98

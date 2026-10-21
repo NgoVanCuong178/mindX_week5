@@ -1,0 +1,43 @@
+sample.xlsx: 131 ticket (10 ticket test bị loại) -> phân tích 121
+Người báo khác nhau: 78 | Ticket không có thẻ: 64 (49%)
+
+Theo giai đoạn: {'Resolved': 91, 'First Response Sent': 17, 'Cancelled': 12, 'New': 6, 'In Progress': 5}
+Theo ưu tiên:   {'High priority': 42, 'Low priority': 40, 'Urgent': 40, 'Medium priority': 9}
+
+== Nhóm vấn đề (sắp theo số ticket) ==
+                                category  tickets  share_pct  users  untagged  urgent_high  est_total_hours
+          Ghi danh / lớp học / điểm danh       35       28.9     24        16           25              8.8
+               TMS / chấm công giáo viên       18       14.9     16         7           15              9.0
+                   CRM / lead / cuộc gọi       14       11.6     11         6           11              3.5
+          Thanh toán / payment / hoá đơn       14       11.6     10         7           10              3.5
+Đăng nhập / mật khẩu / tài khoản bị khoá       14       11.6      8        10            6              1.8
+ Cấp / chuyển tài khoản, email công việc        8        6.6      7         0            7              1.3
+                   Hợp đồng / E-contract        7        5.8      5         3            3              2.3
+                   Điểm thưởng / đổi quà        4        3.3      3         1            3              2.0
+                     Đặt phòng / Crystal        4        3.3      3         3            1              0.7
+                                    Khác        2        1.7      2         1            1              0.5
+                 Email / SMS / thông báo        1        0.8      1         1            0              0.2
+
+== TOP 5 ==
+1. Ghi danh / lớp học / điểm danh: 35 ticket (28.9%), 24 người báo, ~8.8 giờ công | Tự động hoá: Trung bình - thao tác lặp lại nhưng nhiều trường hợp đặc biệt
+2. TMS / chấm công giáo viên: 18 ticket (14.9%), 16 người báo, ~9.0 giờ công | Tự động hoá: Thấp - lỗi hệ thống/dữ liệu, cần dev
+3. CRM / lead / cuộc gọi: 14 ticket (11.6%), 11 người báo, ~3.5 giờ công | Tự động hoá: Trung bình - chuyển trạng thái lead theo quy tắc
+4. Thanh toán / payment / hoá đơn: 14 ticket (11.6%), 10 người báo, ~3.5 giờ công | Tự động hoá: Thấp - thao tác tài chính, cần kế toán duyệt
+5. Đăng nhập / mật khẩu / tài khoản bị khoá: 14 ticket (11.6%), 8 người báo, ~1.8 giờ công | Tự động hoá: Cao - quy trình cố định: kiểm tra HR, kích hoạt lại, đặt lại mật khẩu
+
+== Week 4: 12 ticket, thời gian từ tạo đến đóng (giờ) ==
+ticket           priority                            category  elapsed_hours
+ 00005           Khẩn cấp           S3 Exam outage (Expedite)           0.61
+ 00006           Khẩn cấp          S3 Exam outage - liên quan         103.45
+ 00007           Khẩn cấp          S3 Exam outage - liên quan         103.43
+ 00004 Mức độ ưu tiên cao           S2 Performance (Priority)           0.54
+ 00010 Mức độ ưu tiên cao                 S5 Video (Priority)           0.41
+ 00011 Mức độ ưu tiên cao                S5 Video - liên quan         100.72
+ 00012 Mức độ ưu tiên cao                S5 Video - liên quan         100.72
+ 00013 Mức độ ưu tiên cao S6 Deadline report (Fixed Deadline)           0.26
+ 00001 Ưu tiên trung bình                 S1 Login (Standard)          23.59
+ 00002 Ưu tiên trung bình                 S1 Login (Standard)           0.26
+ 00003 Ưu tiên trung bình                 S1 Login (Standard)           0.17
+ 00009 Ưu tiên trung bình       S4 Feature request (Standard)           0.98
+
+Đã ghi kết quả vào C:\Downloads\mindx\Homework_week5\analysis\output
