@@ -1,0 +1,12 @@
+# Secrets
+.env
+
+# Raw data containing real names / customer info
+data/raw/
+
+# Runtime
+logs/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
