@@ -1,6 +1,5 @@
 # Phân tích mẫu ticket lặp lại
 
-Giai đoạn 2 của Week 5: tìm các vấn đề lặp lại, đo tác động và chọn vấn đề để tự động hoá.
 
 ## Dữ liệu và phương pháp
 
@@ -8,18 +7,6 @@ Giai đoạn 2 của Week 5: tìm các vấn đề lặp lại, đo tác động
 |---|---|---|
 | `sample.xlsx` (thư mục `week-5/data` của onboarding) | 131 ticket Helpdesk thật của MindX, đội Technical Support | Không có cột ngày giờ; có tiêu đề, thẻ, ưu tiên, giai đoạn, người báo |
 | `data/raw/week4-tickets.xlsx` (export từ Odoo, không commit) | 12 ticket thực hành Week 4 | Có ngày tạo, ngày đóng |
-
-Script [`analysis/analyze_tickets.py`](../analysis/analyze_tickets.py):
-
-1. **Đọc file export dạng nhóm** của Odoo: dòng tiêu đề nhóm (`Resolved (91)`), dòng ticket, các dòng phụ chứa thêm thẻ.
-2. **Ẩn danh:** người báo thành `User-001`, `User-002`…; **không ghi tiêu đề ra file** vì tiêu đề chứa tên học viên/giáo viên và số điện thoại.
-3. **Phân nhóm** bằng từ khoá tiếng Việt đã bỏ dấu trong **tiêu đề trước, thẻ sau** (vì 49% ticket không có thẻ). Quy tắc xét theo thứ tự ưu tiên; ticket "Tech test", "TEST"… được tách riêng và loại khỏi thống kê.
-4. **Tính tác động:** số ticket, % trên tổng, số người báo khác nhau, số ticket Urgent/High, số ticket không có thẻ, giờ công ước tính.
-5. **Ghi kết quả** (đã ẩn danh) vào [`analysis/output/`](../analysis/output/): `tickets_categorized.csv`, `category_summary.csv`, `week4_handling_time.csv`, biểu đồ PNG, `run-log.txt`.
-
-Chạy lại: `python analysis/analyze_tickets.py`.
-
-> **Giả định về thời gian:** `sample.xlsx` không có cột ngày giờ, nên thời gian xử lý mỗi ticket là **ước tính theo loại** (đăng nhập 7,5 phút theo mức 5–10 phút trong `tasks.md`; cấp tài khoản/email 10 phút; thanh toán, CRM, ghi danh 15 phút; hợp đồng 20 phút; TMS, điểm thưởng 30 phút). Giờ công trong bảng là để **so sánh tương đối** giữa các nhóm, không phải số đo thật.
 
 ## Tổng quan
 
@@ -65,14 +52,12 @@ Các nhóm còn lại: cấp/chuyển tài khoản & email công việc 8 · h�
 
 ## Vì sao chọn "Đăng nhập" để tự động hoá
 
-Đối chiếu tiêu chí *Operating Engineer Automation Principles* (`tasks.md`):
-
 | Tiêu chí | Ghi danh (#1) | TMS (#2) | **Đăng nhập (#5)** |
 |---|---|---|---|
-| Lặp lại thường xuyên | ✅ | ✅ | ✅ |
-| Cách xử lý thủ công cố định, có thể viết thành quy tắc | ⚠️ nhiều trường hợp đặc biệt | ❌ mỗi lỗi một kiểu | ✅ 4 bước cố định |
-| Nguyên nhân gốc cần sửa code, cần giải pháp ngay | ⚠️ | ✅ | ✅ quy tắc khoá 30 ngày |
-| Tự động xử lý được 80%+ trường hợp | ❌ | ❌ | ✅ chỉ nhân sự đã nghỉ/không rõ cần người xem |
+| Lặp lại thường xuyên | Đạt | Đạt | Đạt |
+| Cách xử lý thủ công cố định, có thể viết thành quy tắc | Một phần – nhiều trường hợp đặc biệt | Không – mỗi lỗi một kiểu | Đạt – 4 bước cố định |
+| Nguyên nhân gốc cần sửa code, cần giải pháp ngay | Một phần | Đạt | Đạt – quy tắc khoá 30 ngày |
+| Tự động xử lý được 80%+ trường hợp | Không | Không | Đạt – chỉ nhân sự đã nghỉ/không rõ cần người xem |
 | Rủi ro khi tự động | Trung bình (sai lớp) | Cao (dữ liệu công) | Thấp – có kiểm tra HR trước khi mở lại |
 
 → **Ghi danh** và **TMS** nhiều ticket hơn nhưng không phù hợp tự động hoá: TMS cần dev sửa lỗi hệ thống (chuyển cho dev, đưa vào [kế hoạch hành động](action-plan.md)); ghi danh nhiều ngoại lệ. **Đăng nhập** có quy trình cố định, rủi ro thấp và mở rộng được sang nhóm "truy cập tài khoản" (18,2%), nên được chọn cho workflow ở Giai đoạn 3–4.
