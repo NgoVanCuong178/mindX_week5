@@ -10,6 +10,7 @@ class Settings:
     odoo_url: str
     odoo_api_key: str
     odoo_db: str = ""
+    odoo_lang: str = "vi_VN"
     team_name: str = "MindX Tech Support"
     new_stage_name: str = "Mới"
     hr_api_url: str = "http://127.0.0.1:8001/hr"
@@ -31,6 +32,7 @@ def load_settings(env: dict[str, str]) -> Settings:
         odoo_url=env["ODOO_URL"].rstrip("/"),
         odoo_api_key=env["ODOO_API_KEY"],
         odoo_db=env.get("ODOO_DB", defaults.odoo_db),
+        odoo_lang=env.get("ODOO_LANG", defaults.odoo_lang),
         team_name=env.get("ODOO_TEAM_NAME", defaults.team_name),
         new_stage_name=env.get("ODOO_NEW_STAGE", defaults.new_stage_name),
         hr_api_url=env.get("HR_API_URL", defaults.hr_api_url),

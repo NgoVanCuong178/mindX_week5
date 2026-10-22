@@ -54,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     settings = load_settings(env)
     processor = TicketProcessor(
         OdooJson2Gateway(settings.odoo_url, settings.odoo_api_key, settings.odoo_db,
-                         settings.team_name, settings.new_stage_name),
+                         settings.team_name, settings.new_stage_name, settings.odoo_lang),
         HttpHrDirectory(settings.hr_api_url),
         HttpLmsAdmin(settings.lms_api_url),
         JsonlAuditLog(settings.audit_log_path),

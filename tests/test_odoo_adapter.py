@@ -27,7 +27,8 @@ class Recorder:
         return httpx.Response(200, json=result)
 
     def bodies(self, route: str) -> list[dict]:
-        return [body for r, body, _ in self.requests if r == route]
+        """Body theo route, bỏ khoá 'context' (ngôn ngữ) - đã có test riêng cho context."""
+        return [{k: v for k, v in body.items() if k != "context"} for r, body, _ in self.requests if r == route]
 
 
 def make(responses: dict) -> tuple[OdooJson2Gateway, Recorder]:
@@ -134,6 +135,21 @@ class TestWrite:
         assert body["subtype_xmlid"] == "mail.mt_comment"
         assert body["partner_ids"] == [7]
         assert body["body"] == "Chào anh/chị<br>Trân trọng" and body["body_is_html"] is True
+
+
+def test_every_request_sends_vietnamese_context_so_stage_names_match_the_ui():
+    """Odoo trả tên giai đoạn theo ngôn ngữ của request (mặc định tiếng Anh 'New') - phát hiện khi chạy E2E."""
+    gateway, rec = make({"helpdesk.ticket/search_read": [], "helpdesk.stage/search_read": [{"id": 3, "name": "Tạm dừng"}]})
+    gateway.fetch_new_tickets()
+    gateway.move_stage(14, "Tạm dừng")
+    assert rec.requests and all(body.get("context") == {"lang": "vi_VN"} for _, body, _ in rec.requests)
+
+
+def test_language_is_configurable():
+    recorder = Recorder({"helpdesk.ticket/search_read": []})
+    client = httpx.Client(transport=httpx.MockTransport(recorder))
+    OdooJson2Gateway("https://x.odoo.com", "KEY", lang="en_US", client=client).fetch_new_tickets()
+    assert recorder.requests[0][1]["context"] == {"lang": "en_US"}
 
 
 def test_http_error_becomes_external_service_error():

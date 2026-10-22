@@ -12,6 +12,7 @@ def test_loads_required_and_default_values():
     assert settings.poll_interval_seconds == 120
     assert settings.incident_threshold == 5
     assert settings.team_name == "MindX Tech Support"
+    assert settings.odoo_lang == "vi_VN"
 
 
 def test_overrides_from_env():

@@ -28,12 +28,13 @@ def html_to_text(value: str | None) -> str:
 
 class OdooJson2Gateway:
     def __init__(self, base_url: str, api_key: str, db: str = "", team_name: str = "MindX Tech Support",
-                 new_stage_name: str = "Mới", client: httpx.Client | None = None) -> None:
+                 new_stage_name: str = "Mới", lang: str = "vi_VN", client: httpx.Client | None = None) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.db = db
         self.team_name = team_name
         self.new_stage_name = new_stage_name
+        self.lang = lang  # tên giai đoạn trả về/tìm kiếm theo ngôn ngữ này (mặc định API dùng tiếng Anh)
         self.client = client or httpx.Client(timeout=20)
         self._stage_ids: dict[str, int] = {}
         self._tag_ids: dict[str, int] = {}
@@ -43,7 +44,8 @@ class OdooJson2Gateway:
         if self.db:
             headers["X-Odoo-Database"] = self.db
         try:
-            response = self.client.post(f"{self.base_url}/json/2/{model}/{method}", json=payload, headers=headers)
+            response = self.client.post(f"{self.base_url}/json/2/{model}/{method}",
+                                        json={**payload, "context": {"lang": self.lang}}, headers=headers)
         except httpx.HTTPError as exc:
             raise ExternalServiceError(f"Odoo {model}.{method}: {exc}") from exc
         if response.status_code >= 400:
