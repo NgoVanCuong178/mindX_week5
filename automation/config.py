@@ -23,9 +23,32 @@ class Settings:
 
 def load_settings(env: dict[str, str]) -> Settings:
     """Tạo Settings từ dict biến môi trường; thiếu ODOO_URL/ODOO_API_KEY -> ValueError."""
-    raise NotImplementedError
+    for key in ("ODOO_URL", "ODOO_API_KEY"):
+        if not env.get(key):
+            raise ValueError(f"Thiếu {key} trong cấu hình")
+    defaults = Settings(odoo_url="", odoo_api_key="")
+    return Settings(
+        odoo_url=env["ODOO_URL"].rstrip("/"),
+        odoo_api_key=env["ODOO_API_KEY"],
+        odoo_db=env.get("ODOO_DB", defaults.odoo_db),
+        team_name=env.get("ODOO_TEAM_NAME", defaults.team_name),
+        new_stage_name=env.get("ODOO_NEW_STAGE", defaults.new_stage_name),
+        hr_api_url=env.get("HR_API_URL", defaults.hr_api_url),
+        lms_api_url=env.get("LMS_API_URL", defaults.lms_api_url),
+        poll_interval_seconds=int(env.get("POLL_INTERVAL_SECONDS", defaults.poll_interval_seconds)),
+        incident_threshold=int(env.get("INCIDENT_THRESHOLD", defaults.incident_threshold)),
+        incident_window_minutes=int(env.get("INCIDENT_WINDOW_MINUTES", defaults.incident_window_minutes)),
+        audit_log_path=Path(env.get("AUDIT_LOG_PATH", defaults.audit_log_path)),
+        webhook_token=env.get("WEBHOOK_TOKEN", defaults.webhook_token),
+    )
 
 
 def read_env_file(path: Path) -> dict[str, str]:
     """Đọc file .env dạng KEY=VALUE (bỏ dòng trống, comment)."""
-    raise NotImplementedError
+    env: dict[str, str] = {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            env[key.strip()] = value.strip()
+    return env
