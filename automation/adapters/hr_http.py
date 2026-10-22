@@ -1,10 +1,9 @@
 """HrDirectory qua HTTP (mock HR API)."""
 from __future__ import annotations
 
-import time
-
 import httpx
 
+from automation.adapters.http_retry import request_with_retry
 from automation.domain.models import Employee, EmployeeStatus
 from automation.ports import ExternalServiceError
 
@@ -18,18 +17,12 @@ class HttpHrDirectory:
         self.backoff_seconds = backoff_seconds
 
     def find_employee(self, email: str) -> Employee | None:
-        last_error = ""
-        for attempt in range(self.retries):
-            try:
-                response = self.client.get(f"{self.base_url}/employees", params={"email": email})
-                if response.status_code == 404:
-                    return None
-                if response.status_code == 200:
-                    data = response.json()
-                    return Employee(email=data["email"], name=data["name"], status=EmployeeStatus(data["status"]))
-                last_error = f"HTTP {response.status_code}"
-            except httpx.HTTPError as exc:
-                last_error = str(exc)
-            if attempt < self.retries - 1:
-                time.sleep(self.backoff_seconds * 2 ** attempt)
-        raise ExternalServiceError(f"HR API lỗi sau {self.retries} lần thử: {last_error}")
+        response = request_with_retry(self.client, "GET", f"{self.base_url}/employees", service="HR",
+                                      retries=self.retries, backoff_seconds=self.backoff_seconds,
+                                      params={"email": email})
+        if response.status_code == 404:
+            return None
+        if response.status_code != 200:
+            raise ExternalServiceError(f"HR API HTTP {response.status_code}")
+        data = response.json()
+        return Employee(email=data["email"], name=data["name"], status=EmployeeStatus(data["status"]))

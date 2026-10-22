@@ -70,6 +70,11 @@ class Classification:
     matched_keywords: tuple[str, ...] = ()
     exclusion: str | None = None
 
+    @property
+    def is_actionable(self) -> bool:
+        """Lỗi đăng nhập LMS, độ tin cậy cao, không bị loại trừ -> workflow được xử lý."""
+        return self.is_login_issue and self.confidence == Confidence.HIGH and self.exclusion is None
+
 
 @dataclass(frozen=True)
 class Decision:

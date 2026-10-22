@@ -1,8 +1,6 @@
 """Điều phối workflow với adapter giả - kiểm tra chuỗi hành động của từng nhánh D1-D7."""
 from datetime import datetime
 
-import pytest
-
 from automation.application.process_ticket import TicketProcessor
 from automation.config import Settings
 from automation.domain.decision import (

@@ -9,7 +9,9 @@ from automation.config import Settings
 from automation.domain.classifier import classify_ticket
 from automation.domain.decision import TAG_PROCESSED, decide, failure_decision, incident_decision
 from automation.domain.messages import render_email, render_note
-from automation.domain.models import Confidence, DecisionCode, EmployeeStatus, Ticket
+from automation.domain.models import (
+    Classification, Decision, DecisionCode, Employee, EmployeeStatus, LmsAccount, Ticket,
+)
 from automation.ports import AuditLog, ExternalServiceError, HrDirectory, LmsAdmin, TicketGateway
 
 
@@ -23,9 +25,14 @@ class Outcome:
     error: str | None = None
 
 
-def _is_candidate(ticket: Ticket) -> bool:
-    c = classify_ticket(ticket.subject, ticket.description)
-    return c.is_login_issue and c.confidence == Confidence.HIGH and not c.exclusion
+@dataclass
+class _Evaluation:
+    """Kết quả các bước tra cứu + hành động LMS cho một ticket."""
+    decision: Decision
+    employee: Employee | None = None
+    account: LmsAccount | None = None
+    reset_link: str | None = None
+    actions: list[str] = field(default_factory=list)
 
 
 class TicketProcessor:
@@ -38,14 +45,16 @@ class TicketProcessor:
         self.settings = settings
         self.now = now
 
+    # ---- điểm vào -------------------------------------------------------
     def run_once(self, dry_run: bool = False) -> list[Outcome]:
         """Lấy ticket mới và xử lý từng ticket; lỗi ở một ticket không dừng cả lượt."""
         tickets = self.gateway.fetch_new_tickets()
-        batch_login = sum(1 for t in tickets if _is_candidate(t))
+        classified = [(t, classify_ticket(t.subject, t.description)) for t in tickets]
+        batch_login = sum(1 for _, c in classified if c.is_actionable)
         outcomes = []
-        for ticket in tickets:
+        for ticket, classification in classified:
             try:
-                outcomes.append(self.process(ticket, dry_run=dry_run, batch_login_count=batch_login))
+                outcomes.append(self.process(ticket, dry_run, batch_login, classification))
             except Exception as exc:  # một ticket lỗi không dừng cả lượt
                 outcomes.append(Outcome(ticket.id, ticket.ref, None, dry_run=dry_run, error=str(exc)))
         return outcomes
@@ -55,62 +64,77 @@ class TicketProcessor:
         ticket = self.gateway.get_ticket(ticket_id)
         return self.process(ticket, dry_run=dry_run) if ticket else None
 
-    def process(self, ticket: Ticket, dry_run: bool = False, batch_login_count: int = 0) -> Outcome:
+    def process(self, ticket: Ticket, dry_run: bool = False, batch_login_count: int = 0,
+                classification: Classification | None = None) -> Outcome:
         if TAG_PROCESSED in ticket.tags:
             return Outcome(ticket.id, ticket.ref, None, ["đã xử lý trước đó"], dry_run)
+        classification = classification or classify_ticket(ticket.subject, ticket.description)
 
-        classification = classify_ticket(ticket.subject, ticket.description)
-        candidate = (classification.is_login_issue and classification.confidence == Confidence.HIGH
-                     and not classification.exclusion)
-        employee = account = link = None
-        actions: list[str] = []
-
-        if not candidate:
-            decision = decide(classification, None, None, ticket.partner_email)
-            self._audit(ticket, decision, False, dry_run, actions)
-            return Outcome(ticket.id, ticket.ref, decision.code, actions, dry_run)
-
-        since = self.now() - timedelta(minutes=self.settings.incident_window_minutes)
-        login_count = batch_login_count + self.audit.count_recent_login(since)
-        if login_count >= self.settings.incident_threshold:
-            decision = incident_decision(f"{login_count} ticket đăng nhập trong "
-                                         f"{self.settings.incident_window_minutes} phút")
-        elif not self.lms.health():
-            decision = incident_decision("LMS health check lỗi")
-        elif not ticket.partner_email:
-            decision = decide(classification, None, None, None)
+        if not classification.is_actionable:
+            evaluation = _Evaluation(decide(classification, None, None, ticket.partner_email))
         else:
-            email = ticket.partner_email
-            try:
-                employee = self.hr.find_employee(email)
-                if employee and employee.status == EmployeeStatus.ACTIVE:
-                    account = self.lms.get_account(email)
-                decision = decide(classification, employee, account, email)
-                if not dry_run:
-                    if decision.reactivate:
-                        self.lms.reactivate(email)
-                        actions.append("Kích hoạt lại tài khoản LMS")
-                    if decision.reset_link:
-                        link = self.lms.create_reset_link(email)
-                        actions.append("Tạo link đặt lại mật khẩu (hiệu lực 24 giờ)")
-            except ExternalServiceError as exc:
-                decision = failure_decision(str(exc))
+            evaluation = self._evaluate(ticket, classification, batch_login_count, dry_run)
+            if not dry_run:
+                self._write_to_odoo(ticket, classification, evaluation)
 
-        if not dry_run:
-            if decision.email_template and ticket.partner_id:
-                text = render_email(decision.email_template, ticket.partner_name, ticket.ref, link)
-                self.gateway.send_email(ticket.id, ticket.partner_id, text)
-                actions.append("Gửi email phản hồi người dùng")
-            self.gateway.post_note(ticket.id, render_note(decision, classification, employee, account, actions))
-            self.gateway.add_tags(ticket.id, [*decision.tags, TAG_PROCESSED])
-            if decision.next_stage:
-                self.gateway.move_stage(ticket.id, decision.next_stage)
-        self._audit(ticket, decision, True, dry_run, actions)
-        return Outcome(ticket.id, ticket.ref, decision.code, actions, dry_run)
+        self._audit(ticket, evaluation, classification.is_actionable, dry_run)
+        return Outcome(ticket.id, ticket.ref, evaluation.decision.code, evaluation.actions, dry_run)
 
-    def _audit(self, ticket: Ticket, decision, login: bool, dry_run: bool, actions: list[str]) -> None:
+    # ---- các bước ------------------------------------------------------
+    def _incident_reason(self, batch_login_count: int) -> str | None:
+        """D6: quá nhiều ticket đăng nhập trong cửa sổ thời gian, hoặc LMS không khoẻ."""
+        window = self.settings.incident_window_minutes
+        login_count = batch_login_count + self.audit.count_recent_login(self.now() - timedelta(minutes=window))
+        if login_count >= self.settings.incident_threshold:
+            return f"{login_count} ticket đăng nhập trong {window} phút"
+        if not self.lms.health():
+            return "LMS health check lỗi"
+        return None
+
+    def _evaluate(self, ticket: Ticket, classification: Classification, batch_login_count: int,
+                  dry_run: bool) -> _Evaluation:
+        incident = self._incident_reason(batch_login_count)
+        if incident:
+            return _Evaluation(incident_decision(incident))
+        email = ticket.partner_email
+        if not email:
+            return _Evaluation(decide(classification, None, None, None))
+        evaluation = _Evaluation(decision=failure_decision("chưa xử lý"))
+        try:
+            evaluation.employee = self.hr.find_employee(email)
+            if evaluation.employee and evaluation.employee.status == EmployeeStatus.ACTIVE:
+                evaluation.account = self.lms.get_account(email)
+            evaluation.decision = decide(classification, evaluation.employee, evaluation.account, email)
+            if not dry_run:
+                self._apply_lms_actions(email, evaluation)
+        except ExternalServiceError as exc:
+            evaluation.decision = failure_decision(str(exc))
+        return evaluation
+
+    def _apply_lms_actions(self, email: str, evaluation: _Evaluation) -> None:
+        """Thao tác LMS chạy trước mọi thao tác ghi Odoo."""
+        if evaluation.decision.reactivate:
+            self.lms.reactivate(email)
+            evaluation.actions.append("Kích hoạt lại tài khoản LMS")
+        if evaluation.decision.reset_link:
+            evaluation.reset_link = self.lms.create_reset_link(email)
+            evaluation.actions.append("Tạo link đặt lại mật khẩu (hiệu lực 24 giờ)")
+
+    def _write_to_odoo(self, ticket: Ticket, classification: Classification, evaluation: _Evaluation) -> None:
+        decision = evaluation.decision
+        if decision.email_template and ticket.partner_id:
+            text = render_email(decision.email_template, ticket.partner_name, ticket.ref, evaluation.reset_link)
+            self.gateway.send_email(ticket.id, ticket.partner_id, text)
+            evaluation.actions.append("Gửi email phản hồi người dùng")
+        note = render_note(decision, classification, evaluation.employee, evaluation.account, evaluation.actions)
+        self.gateway.post_note(ticket.id, note)
+        self.gateway.add_tags(ticket.id, [*decision.tags, TAG_PROCESSED])
+        if decision.next_stage:
+            self.gateway.move_stage(ticket.id, decision.next_stage)
+
+    def _audit(self, ticket: Ticket, evaluation: _Evaluation, login: bool, dry_run: bool) -> None:
         self.audit.record({
             "at": self.now().isoformat(), "ticket": ticket.ref, "ticket_id": ticket.id,
-            "decision": decision.code.value, "reason": decision.reason, "login": login,
-            "dry_run": dry_run, "actions": actions, "email": ticket.partner_email,
+            "decision": evaluation.decision.code.value, "reason": evaluation.decision.reason, "login": login,
+            "dry_run": dry_run, "actions": evaluation.actions, "email": ticket.partner_email,
         })

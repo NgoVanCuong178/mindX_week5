@@ -36,6 +36,7 @@ class OdooJson2Gateway:
         self.new_stage_name = new_stage_name
         self.client = client or httpx.Client(timeout=20)
         self._stage_ids: dict[str, int] = {}
+        self._tag_ids: dict[str, int] = {}
 
     def _call(self, model: str, method: str, payload: dict):
         headers = {"Authorization": f"bearer {self.api_key}"}
@@ -77,33 +78,38 @@ class OdooJson2Gateway:
                           {"domain": [["id", "=", ticket_id]], "fields": TICKET_FIELDS, "limit": 1})
         return self._to_ticket(rows[0]) if rows else None
 
+    def _resolve_ids(self, model: str, names: list[str], cache: dict[str, int]) -> dict[str, int]:
+        """Tra id theo tên (giai đoạn, thẻ) và lưu cache - tên ít thay đổi trong một lượt chạy."""
+        unknown = [name for name in names if name not in cache]
+        if unknown:
+            rows = self._call(model, "search_read", {"domain": [["name", "in", unknown]], "fields": ["id", "name"]})
+            cache.update({row["name"]: row["id"] for row in rows})
+        missing = [name for name in names if name not in cache]
+        if missing:
+            raise ValueError(f"Không tìm thấy {model} trên Odoo: {', '.join(missing)}")
+        return {name: cache[name] for name in names}
+
+    def _write(self, ticket_id: int, vals: dict) -> None:
+        self._call("helpdesk.ticket", "write", {"ids": [ticket_id], "vals": vals})
+
+    def _message_post(self, ticket_id: int, text: str, subtype_xmlid: str, **extra) -> None:
+        self._call("helpdesk.ticket", "message_post", {
+            "ids": [ticket_id], "body": text_to_html(text), "body_is_html": True,
+            "message_type": "comment", "subtype_xmlid": subtype_xmlid, **extra,
+        })
+
     def move_stage(self, ticket_id: int, stage_name: str) -> None:
-        if stage_name not in self._stage_ids:
-            rows = self._call("helpdesk.stage", "search_read",
-                              {"domain": [["name", "=", stage_name]], "fields": ["id", "name"], "limit": 1})
-            if not rows:
-                raise ValueError(f"Không tìm thấy giai đoạn '{stage_name}' trên Odoo")
-            self._stage_ids[stage_name] = rows[0]["id"]
-        self._call("helpdesk.ticket", "write", {"ids": [ticket_id], "vals": {"stage_id": self._stage_ids[stage_name]}})
+        stage_id = self._resolve_ids("helpdesk.stage", [stage_name], self._stage_ids)[stage_name]
+        self._write(ticket_id, {"stage_id": stage_id})
 
     def add_tags(self, ticket_id: int, tag_names: list[str]) -> None:
-        rows = self._call("helpdesk.tag", "search_read",
-                          {"domain": [["name", "in", tag_names]], "fields": ["id", "name"]})
-        ids = {row["name"]: row["id"] for row in rows}
-        missing = [name for name in tag_names if name not in ids]
-        if missing:
-            raise ValueError(f"Chưa tạo thẻ trên Odoo: {', '.join(missing)}")
-        self._call("helpdesk.ticket", "write",
-                   {"ids": [ticket_id], "vals": {"tag_ids": [[4, ids[name]] for name in tag_names]}})
+        ids = self._resolve_ids("helpdesk.tag", tag_names, self._tag_ids)
+        self._write(ticket_id, {"tag_ids": [[4, ids[name]] for name in tag_names]})
 
     def post_note(self, ticket_id: int, text: str) -> None:
-        self._call("helpdesk.ticket", "message_post", {
-            "ids": [ticket_id], "body": text_to_html(text), "body_is_html": True,
-            "message_type": "comment", "subtype_xmlid": "mail.mt_note",
-        })
+        """Ghi chú nội bộ - khách hàng không thấy."""
+        self._message_post(ticket_id, text, "mail.mt_note")
 
     def send_email(self, ticket_id: int, partner_id: int, text: str) -> None:
-        self._call("helpdesk.ticket", "message_post", {
-            "ids": [ticket_id], "body": text_to_html(text), "body_is_html": True,
-            "message_type": "comment", "subtype_xmlid": "mail.mt_comment", "partner_ids": [partner_id],
-        })
+        """Tin nhắn gửi tới khách hàng (email)."""
+        self._message_post(ticket_id, text, "mail.mt_comment", partner_ids=[partner_id])
