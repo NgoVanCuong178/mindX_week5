@@ -29,6 +29,12 @@ class TestLoginIssue:
         assert result.exclusion is None
         assert "dang nhap" in result.matched_keywords
 
+    def test_matched_keywords_drop_ones_contained_in_longer_matches(self):
+        """Ghi chú E1 liệt kê cả 'invalid username or password' lẫn 'password' - trùng ý."""
+        result = classify_ticket("Lỗi Invalid username or password trên LMS")
+        assert "invalid username or password" in result.matched_keywords
+        assert "password" not in result.matched_keywords
+
     def test_denise_account_support_is_lms(self):
         result = classify_ticket("PNL HỖ TRỢ TÀI KHOẢN DENISE")
         assert result.is_login_issue is True

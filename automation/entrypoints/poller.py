@@ -5,18 +5,12 @@ python -m automation.entrypoints.poller [--once] [--dry-run] [--interval GIÂY]
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
 from typing import Callable
 
-from automation.adapters.hr_http import HttpHrDirectory
-from automation.adapters.jsonl_audit_log import JsonlAuditLog
-from automation.adapters.lms_http import HttpLmsAdmin
-from automation.adapters.odoo_json2 import OdooJson2Gateway
-from automation.application.process_ticket import TicketProcessor
-from automation.config import load_settings, read_env_file
+from automation.bootstrap import build_processor, load_runtime_settings
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -49,17 +43,8 @@ def run_loop(processor, interval_seconds: int, once: bool, dry_run: bool,
 def main(argv: list[str] | None = None) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
-    env_file = Path(args.env_file)
-    env = {**(read_env_file(env_file) if env_file.exists() else {}), **os.environ}
-    settings = load_settings(env)
-    processor = TicketProcessor(
-        OdooJson2Gateway(settings.odoo_url, settings.odoo_api_key, settings.odoo_db,
-                         settings.team_name, settings.new_stage_name, settings.odoo_lang),
-        HttpHrDirectory(settings.hr_api_url),
-        HttpLmsAdmin(settings.lms_api_url),
-        JsonlAuditLog(settings.audit_log_path),
-        settings,
-    )
+    settings = load_runtime_settings(Path(args.env_file))
+    processor = build_processor(settings)
     interval = args.interval or settings.poll_interval_seconds
     print(f"Poller bắt đầu: interval={interval}s, dry_run={args.dry_run}, once={args.once}")
     run_loop(processor, interval, args.once, args.dry_run)

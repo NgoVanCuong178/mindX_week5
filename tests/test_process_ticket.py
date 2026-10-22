@@ -147,6 +147,19 @@ class TestStopBranches:
         assert outcome.decision == DecisionCode.D6_INCIDENT
         assert hr.lookups == []
 
+    def test_incident_count_does_not_double_count_tickets_of_the_same_batch(self):
+        """Phát hiện ở E2E (E9): ticket thứ 2 ghi '3 ticket' vì ticket thứ 1 vừa được ghi log."""
+        class CountingAudit(FakeAudit):
+            def count_recent_login(self, since):
+                return sum(1 for e in self.events if e.get("login") and not e.get("dry_run"))
+
+        audit = CountingAudit()
+        processor, *_ = build([login_ticket(tid=40), login_ticket(tid=41)], audit=audit)
+        processor.settings = Settings(odoo_url="x", odoo_api_key="k", incident_threshold=2)
+        outcomes = processor.run_once()
+        assert [o.decision for o in outcomes] == [DecisionCode.D6_INCIDENT] * 2
+        assert [e["reason"] for e in audit.events] == ["2 ticket đăng nhập trong 30 phút"] * 2
+
     def test_run_once_batch_of_five_login_tickets_is_an_incident(self):
         tickets = [login_ticket(tid=20 + i) for i in range(5)]
         processor, _, hr, lms, _ = build(tickets)

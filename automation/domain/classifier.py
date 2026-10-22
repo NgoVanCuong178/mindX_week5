@@ -31,7 +31,9 @@ def classify_ticket(subject: str, description: str = "") -> Classification:
     """Phân loại ticket theo tiêu đề + mô tả."""
     subj, desc = normalize(subject), normalize(description)
     text = f"{subj} {desc}"
-    matched = tuple(k for k in LOGIN_KEYWORDS if k in text)
+    found = [k for k in LOGIN_KEYWORDS if k in text]
+    # bỏ từ khoá nằm trong một từ khoá dài hơn đã khớp ("password" trong "invalid username or password")
+    matched = tuple(k for k in found if not any(k != other and k in other for other in found))
     if not matched:
         return Classification(is_login_issue=False, confidence=Confidence.LOW)
 

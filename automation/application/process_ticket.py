@@ -51,10 +51,11 @@ class TicketProcessor:
         tickets = self.gateway.fetch_new_tickets()
         classified = [(t, classify_ticket(t.subject, t.description)) for t in tickets]
         batch_login = sum(1 for _, c in classified if c.is_actionable)
+        recent_login = self._recent_login_count()  # đếm 1 lần trước lượt - không đếm lại ticket cùng lượt
         outcomes = []
         for ticket, classification in classified:
             try:
-                outcomes.append(self.process(ticket, dry_run, batch_login, classification))
+                outcomes.append(self.process(ticket, dry_run, batch_login, classification, recent_login))
             except Exception as exc:  # một ticket lỗi không dừng cả lượt
                 outcomes.append(Outcome(ticket.id, ticket.ref, None, dry_run=dry_run, error=str(exc)))
         return outcomes
@@ -65,7 +66,7 @@ class TicketProcessor:
         return self.process(ticket, dry_run=dry_run) if ticket else None
 
     def process(self, ticket: Ticket, dry_run: bool = False, batch_login_count: int = 0,
-                classification: Classification | None = None) -> Outcome:
+                classification: Classification | None = None, recent_login_count: int | None = None) -> Outcome:
         if TAG_PROCESSED in ticket.tags:
             return Outcome(ticket.id, ticket.ref, None, ["đã xử lý trước đó"], dry_run)
         classification = classification or classify_ticket(ticket.subject, ticket.description)
@@ -73,7 +74,9 @@ class TicketProcessor:
         if not classification.is_actionable:
             evaluation = _Evaluation(decide(classification, None, None, ticket.partner_email))
         else:
-            evaluation = self._evaluate(ticket, classification, batch_login_count, dry_run)
+            if recent_login_count is None:
+                recent_login_count = self._recent_login_count()
+            evaluation = self._evaluate(ticket, classification, batch_login_count + recent_login_count, dry_run)
             if not dry_run:
                 self._write_to_odoo(ticket, classification, evaluation)
 
@@ -81,19 +84,22 @@ class TicketProcessor:
         return Outcome(ticket.id, ticket.ref, evaluation.decision.code, evaluation.actions, dry_run)
 
     # ---- các bước ------------------------------------------------------
-    def _incident_reason(self, batch_login_count: int) -> str | None:
+    def _recent_login_count(self) -> int:
+        since = self.now() - timedelta(minutes=self.settings.incident_window_minutes)
+        return self.audit.count_recent_login(since)
+
+    def _incident_reason(self, login_count: int) -> str | None:
         """D6: quá nhiều ticket đăng nhập trong cửa sổ thời gian, hoặc LMS không khoẻ."""
         window = self.settings.incident_window_minutes
-        login_count = batch_login_count + self.audit.count_recent_login(self.now() - timedelta(minutes=window))
         if login_count >= self.settings.incident_threshold:
             return f"{login_count} ticket đăng nhập trong {window} phút"
         if not self.lms.health():
             return "LMS health check lỗi"
         return None
 
-    def _evaluate(self, ticket: Ticket, classification: Classification, batch_login_count: int,
+    def _evaluate(self, ticket: Ticket, classification: Classification, login_count: int,
                   dry_run: bool) -> _Evaluation:
-        incident = self._incident_reason(batch_login_count)
+        incident = self._incident_reason(login_count)
         if incident:
             return _Evaluation(incident_decision(incident))
         email = ticket.partner_email
