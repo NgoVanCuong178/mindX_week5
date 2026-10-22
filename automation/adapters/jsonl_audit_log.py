@@ -39,6 +39,7 @@ class JsonlAuditLog:
         count = 0
         for line in self.path.read_text(encoding="utf-8").splitlines():
             event = json.loads(line)
-            if event.get("login") and event.get("at") and datetime.fromisoformat(event["at"]) >= since:
+            if (event.get("login") and not event.get("dry_run") and event.get("at")
+                    and datetime.fromisoformat(event["at"]) >= since):
                 count += 1
         return count
