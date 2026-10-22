@@ -1,3 +1,12 @@
+# Phân tích dữ liệu (Giai đoạn 2)
 pandas>=2.2
 openpyxl>=3.1
 matplotlib>=3.8
+
+# Workflow tự động hoá (Giai đoạn 4)
+httpx>=0.27
+fastapi>=0.110
+uvicorn>=0.29
+
+# Kiểm thử
+pytest>=8.0

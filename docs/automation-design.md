@@ -1,6 +1,6 @@
 # Thiết kế workflow tự động hoá ticket đăng nhập
 
-Giai đoạn 3 của Week 5. Vấn đề được chọn từ [pattern-analysis.md](pattern-analysis.md): ticket **đăng nhập / tài khoản bị khoá** (Scenario 1, Week 4) – quy trình xử lý cố định 4 bước, nguyên nhân gốc nằm trong code (tài khoản tự vô hiệu hoá sau 30 ngày không đăng nhập), xử lý tay mất 5–10 phút mỗi ticket.
+ticket **đăng nhập / tài khoản bị khoá** (Scenario 1, Week 4) – quy trình xử lý cố định 4 bước, nguyên nhân gốc nằm trong code (tài khoản tự vô hiệu hoá sau 30 ngày không đăng nhập), xử lý tay mất 5–10 phút mỗi ticket.
 
 ## 1. Mục tiêu và phạm vi
 
@@ -60,11 +60,8 @@ flowchart TD
 | D6 | ≥ 5 ticket đăng nhập trong 30 phút, hoặc LMS health check lỗi | Dừng tự động cho cả loạt | Không gửi kết quả | Ghi chú "có thể là sự cố hệ thống", thẻ `possible-incident` – xử lý theo quy trình Priority/Expedite |
 | D7 | Không phải lỗi đăng nhập LMS / độ tin cậy thấp | Bỏ qua | – | Không thay đổi (không gắn thẻ) |
 
-**Chỉ D1, D2 có hành động tự động trên tài khoản**, và chỉ khi: độ tin cậy phân loại cao, HR = đang làm việc, email người báo khớp chính xác email trong HR và LMS, lý do khoá là *không hoạt động 30 ngày*.
-
 ## 5. Phân loại ticket (classifier)
 
-Dùng lại bộ quy tắc từ khoá tiếng Việt không dấu của [`analysis/analyze_tickets.py`](../analysis/analyze_tickets.py) (đã kiểm chứng trên 131 ticket thật), áp dụng cho **tiêu đề + mô tả**:
 
 | Thành phần | Ví dụ |
 |---|---|
@@ -182,8 +179,6 @@ MindX Tech Support (phản hồi tự động)
 Ticket #{ref}
 ```
 
-**Ghi chú nội bộ** (mọi nhánh) ghi: quyết định (D1–D7), từ khoá khớp, trạng thái HR, trạng thái LMS và lý do khoá, hành động đã làm, thời gian xử lý, việc người xử lý cần làm tiếp (với D3–D6).
-
 ## 9. An toàn và độ tin cậy
 
 | Rủi ro | Biện pháp |
@@ -216,9 +211,3 @@ Số liệu lấy từ `logs/automation.jsonl` và báo cáo Odoo lọc theo th�
 | Integration | Adapter HR/LMS gọi `mock_services` thật; adapter Odoo kiểm tra request/response JSON-2 |
 | End-to-end | 7 ca trên Odoo thật (Giai đoạn 5): D1, D2, D3, D4, ticket không liên quan, tắt mock HR, chạy lại không xử lý trùng |
 
-## 12. Hướng mở rộng
-
-- Thêm adapter cho TMS, ECount khi có API quản trị → phủ toàn nhóm "truy cập tài khoản" (18,2% ticket).
-- Tự nhắc người dùng sau 48 giờ ở *Tạm dừng* chưa phản hồi, đóng sau khi xác nhận.
-- Chuyển phân loại từ từ khoá sang mô hình ngôn ngữ khi có nhiều dữ liệu gắn nhãn.
-- Đề xuất dev sửa gốc: gửi cảnh báo trước khi khoá tài khoản, hoặc kéo dài thời hạn 30 ngày (xem [kế hoạch hành động](action-plan.md)).

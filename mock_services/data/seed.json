@@ -1,0 +1,16 @@
+{
+  "employees": [
+    {"email": "gv.khoa@example.com",     "name": "Nguyễn Văn Khoa", "status": "active"},
+    {"email": "gv.matkhau@example.com",  "name": "Trần Thị Mai",    "status": "active"},
+    {"email": "gv.nghiviec@example.com", "name": "Lê Văn Nam",      "status": "terminated"},
+    {"email": "gv.tamnghi@example.com",  "name": "Phạm Thị Lan",    "status": "on_leave"},
+    {"email": "gv.admin@example.com",    "name": "Hoàng Văn Minh",  "status": "active"}
+  ],
+  "accounts": [
+    {"email": "gv.khoa@example.com",     "last_login_days_ago": 45, "admin_locked": false},
+    {"email": "gv.matkhau@example.com",  "last_login_days_ago": 2,  "admin_locked": false},
+    {"email": "gv.nghiviec@example.com", "last_login_days_ago": 20, "admin_locked": true},
+    {"email": "gv.tamnghi@example.com",  "last_login_days_ago": 60, "admin_locked": false},
+    {"email": "gv.admin@example.com",    "last_login_days_ago": 5,  "admin_locked": true}
+  ]
+}
