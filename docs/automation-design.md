@@ -26,6 +26,29 @@ ticket **đăng nhập / tài khoản bị khoá** (Scenario 1, Week 4) – quy 
 | **Không tự đóng ticket** | Sau khi xử lý, ticket chuyển **Tạm dừng** chờ người dùng xác nhận (góp ý mentor Week 4) |
 | **Đo được** | Log từng quyết định để tính tỉ lệ tự động hoá và thời gian phản hồi (success metrics của Operating Engineer) |
 
+### Vì sao tự động hoá thay vì sửa code
+
+Nguyên nhân gốc là quy tắc **tự vô hiệu hoá tài khoản sau 30 ngày không đăng nhập** nằm trong code LMS.
+
+| | Sửa code (Software Engineer) | Tự động hoá (Operating Engineer) – **đã chọn** |
+|---|---|---|
+| Làm gì | Đổi quy tắc khoá 30 ngày trong LMS | Workflow xử lý ticket bằng API quản trị có sẵn |
+| Ai làm, bao lâu | Dev LMS; nhiều ngày–tuần, phải chờ ưu tiên trong backlog | Support / Operating Engineer; vài ngày, không chờ dev |
+| Rủi ro | Đổi hành vi bảo mật cho mọi người dùng | Không đổi hệ thống; chỉ làm đúng thao tác support vẫn làm tay |
+| Giải quyết | Nguyên nhân gốc, lâu dài | Triệu chứng, ngay lập tức |
+
+Đối chiếu tiêu chí *When to Create Automation* (`tasks.md` Week 5):
+
+| Tiêu chí | Ticket đăng nhập |
+|---|---|
+| Lặp lại thường xuyên | 14/121 ticket (11,6%); 18,2% nếu gộp nhóm truy cập tài khoản |
+| Xử lý tay hiệu quả nhưng tốn thời gian | 4 bước cố định, 5–10 phút mỗi ticket |
+| Sửa gốc cần đổi code | Quy tắc khoá 30 ngày trong LMS |
+| Cần giải pháp ngay | Giáo viên cần tài liệu cho buổi dạy trong ngày |
+| Xử lý được 80%+ trường hợp | D1/D2 hoàn tất tự động; D3–D6 phản hồi ngay và chuyển người kèm ghi chú đầy đủ |
+
+**Khi nào chuyển sang sửa code** (đề xuất dev, xem [action-plan.md](action-plan.md) hành động #2): số ticket đăng nhập không giảm sau 8 tuần; ticket tự động bị mở lại trên 5%; nhiều hệ thống (TMS, ECount) có cùng quy tắc khoá. Đề xuất sửa gốc: gửi email cảnh báo 7 ngày trước khi khoá, hoặc không khoá tài khoản giáo viên đang được xếp lớp.
+
 ## 3. Luồng xử lý
 
 ```mermaid
@@ -119,7 +142,7 @@ tests/                            # unit (domain), service (fakes), integration 
 
 **Thẻ cần tạo trên Odoo:** `auto-processed`, `auto-reactivated`, `auto-password-guide`, `needs-review`, `automation-failed`, `possible-incident`.
 
-**SLA:** ticket đăng nhập là Standard (★, phản hồi 30 phút). Workflow chuyển *Đang thực hiện* ngay khi xử lý → đạt SLA trong vài phút.
+**SLA:** ticket đăng nhập là Standard (ưu tiên 1 sao, phản hồi 30 phút). Workflow chuyển *Đang thực hiện* ngay khi xử lý → đạt SLA trong vài phút.
 
 ## 8. Mẫu email (giọng lịch sự, theo góp ý mentor Week 4)
 

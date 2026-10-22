@@ -12,8 +12,8 @@ Phân tích ticket Helpdesk để tìm vấn đề lặp lại, và xây workflo
 | Tích hợp Odoo (API) | External JSON-2 API; trigger quét định kỳ (Task Scheduler), webhook sẵn sàng | [odoo-integration-setup.md](docs/odoo-integration-setup.md) |
 | Kiểm thử | 136 test (TDD) · 9/9 ca end-to-end trên Odoo thật | [test-evidence.md](docs/test-evidence.md) |
 | Kế hoạch giảm ticket | 9 hành động, mục tiêu −25% ticket xử lý tay trong 8 tuần | [action-plan.md](docs/action-plan.md) |
-| Tư duy Operating Engineer | Tự động hoá vs sửa code, ranh giới escalate | [operating-engineer-approach.md](docs/operating-engineer-approach.md) |
-| Knowledge base, trình bày | Bài KB cho support; slide | [kb-login-automation.md](docs/kb-login-automation.md), [presentation.md](docs/presentation.md) |
+| Tư duy Operating Engineer | Tự động hoá vs sửa code, khi nào chuyển dev, ranh giới escalate | [automation-design.md – mục 2](docs/automation-design.md#vì-sao-tự-động-hoá-thay-vì-sửa-code) |
+| Knowledge base | Bài KB cho support (đã đăng trên Odoo Kiến thức) | [kb-login-automation.md](docs/kb-login-automation.md) |
 
 ## Workflow
 

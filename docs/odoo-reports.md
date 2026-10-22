@@ -38,7 +38,7 @@ Tất cả báo cáo mở từ **Hỗ trợ → Báo cáo → Phân tích phiế
 
 **Nhận xét:**
 - `lms` xuất hiện ở 9/12 ticket: phần lớn yêu cầu liên quan tới hệ thống LMS.
-- Ưu tiên: Trung bình (★, Standard) 4 · Cao (★★, Priority/Fixed Deadline) 5 · Khẩn cấp (★★★, Expedite) 3.
+- Ưu tiên: Trung bình (1 sao, Standard) 4 · Cao (2 sao, Priority/Fixed Deadline) 5 · Khẩn cấp (3 sao, Expedite) 3.
 - **Thẻ đang trộn nhiều chiều**: hệ thống (`lms`, `cdn`), loại vấn đề (`login`, `video`, `performance`), mức ưu tiên (`priority`, `expedite`), sự cố cụ thể (`inc-exam-submit`, `lesson-3`). Nên tách thành nhóm thẻ có quy ước (xem [action-plan.md](action-plan.md)) để báo cáo theo loại chính xác hơn.
 
 ## 4. Xu hướng số lượng ticket
@@ -62,9 +62,9 @@ Báo cáo *Phân tích trạng thái SLA* ban đầu không có dữ liệu vì 
 
 | Chính sách | Điều kiện | Thời hạn |
 |---|---|---|
-| Standard – phản hồi 30 phút | Mức độ ưu tiên = Trung bình (★) | 30 phút |
-| Priority – phản hồi 15 phút | Mức độ ưu tiên = Cao (★★) | 15 phút |
-| Expedite – phản hồi 5 phút | Mức độ ưu tiên = Khẩn cấp (★★★) | 5 phút |
+| Standard – phản hồi 30 phút | Mức độ ưu tiên = Trung bình (1 sao) | 30 phút |
+| Priority – phản hồi 15 phút | Mức độ ưu tiên = Cao (2 sao) | 15 phút |
+| Expedite – phản hồi 5 phút | Mức độ ưu tiên = Khẩn cấp (3 sao) | 5 phút |
 
 ![Chính sách SLA](../images/sla-policies.png)
 
