@@ -8,11 +8,14 @@
   - tickets_categorized.csv, category_summary.csv, week4_handling_time.csv
   - chart-categories.png, chart-priority.png, chart-stage.png, chart-tag-coverage.png
 
-Chạy:  python analysis/analyze_tickets.py [--sample PATH] [--week4 PATH]
+Chạy:  python analysis/analyze_tickets.py --sample PATH [--week4 PATH] [--output DIR]
+       (hoặc đặt biến môi trường TICKET_SAMPLE_PATH thay cho --sample)
+Không có dữ liệu gốc: dùng dữ liệu mẫu ẩn danh tests/fixtures/sample_anonymized.xlsx.
 """
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 import unicodedata
@@ -27,7 +30,8 @@ import openpyxl  # noqa: E402
 import pandas as pd  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SAMPLE = ROOT.parent / "mindx-engineering-onboarding/docs/plans/week-5/data/sample.xlsx"
+SAMPLE_ENV = "TICKET_SAMPLE_PATH"
+FIXTURE_SAMPLE = ROOT / "tests/fixtures/sample_anonymized.xlsx"
 DEFAULT_WEEK4 = ROOT / "data/raw/week4-tickets.xlsx"
 OUTPUT_DIR = ROOT / "analysis/output"
 
@@ -248,33 +252,49 @@ def bar_chart(series: pd.Series, title: str, path: Path, xlabel: str = "Số tic
     plt.close(fig)
 
 
-def make_charts(df: pd.DataFrame, summary: pd.DataFrame) -> None:
+def make_charts(df: pd.DataFrame, summary: pd.DataFrame, output_dir: Path) -> None:
     bar_chart(summary.set_index("category").tickets,
-              "Số ticket theo nhóm vấn đề (sample.xlsx, không tính ticket test)",
-              OUTPUT_DIR / "chart-categories.png")
-    bar_chart(df.priority.value_counts(), "Phân bổ mức độ ưu tiên", OUTPUT_DIR / "chart-priority.png")
-    bar_chart(df.stage.value_counts(), "Phân bổ giai đoạn", OUTPUT_DIR / "chart-stage.png")
+              "Số ticket theo nhóm vấn đề (không tính ticket test)",
+              output_dir / "chart-categories.png")
+    bar_chart(df.priority.value_counts(), "Phân bổ mức độ ưu tiên", output_dir / "chart-priority.png")
+    bar_chart(df.stage.value_counts(), "Phân bổ giai đoạn", output_dir / "chart-stage.png")
     coverage = df.assign(has_tag=df.tag_count > 0).groupby("category").has_tag.mean().mul(100).round(0)
     bar_chart(coverage.astype(int), "Tỉ lệ ticket có gắn thẻ theo nhóm (%)",
-              OUTPUT_DIR / "chart-tag-coverage.png", xlabel="% ticket có thẻ")
+              output_dir / "chart-tag-coverage.png", xlabel="% ticket có thẻ")
 
 
-def main() -> None:
+def resolve_sample(path: Path | None) -> Path:
+    """--sample, hoặc biến môi trường TICKET_SAMPLE_PATH; thiếu/sai -> dừng kèm hướng dẫn."""
+    path = path or (Path(os.environ[SAMPLE_ENV]) if os.environ.get(SAMPLE_ENV) else None)
+    if path is None:
+        raise SystemExit(
+            "Thiếu dữ liệu ticket. Chạy với --sample PATH (export Odoo dạng nhóm, ví dụ sample.xlsx của onboarding)"
+            f" hoặc đặt biến môi trường {SAMPLE_ENV}. "
+            f"Không có dữ liệu gốc: dùng dữ liệu mẫu ẩn danh --sample {FIXTURE_SAMPLE.relative_to(ROOT).as_posix()}")
+    if not path.exists():
+        raise SystemExit(f"Không tìm thấy file dữ liệu: {path}")
+    return path
+
+
+def main(argv: list[str] | None = None) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--sample", type=Path, default=DEFAULT_SAMPLE)
+    parser.add_argument("--sample", type=Path, default=None, help=f"file export Odoo (hoặc biến {SAMPLE_ENV})")
     parser.add_argument("--week4", type=Path, default=DEFAULT_WEEK4)
-    args = parser.parse_args()
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    parser.add_argument("--output", type=Path, default=OUTPUT_DIR, help="thư mục ghi kết quả")
+    args = parser.parse_args(argv)
+    sample_path = resolve_sample(args.sample)
+    output_dir = args.output
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    sample = read_sample(args.sample)
-    df, summary = analyze_sample(sample)
-    df.to_csv(OUTPUT_DIR / "tickets_categorized.csv", index=False, encoding="utf-8-sig")
-    summary.to_csv(OUTPUT_DIR / "category_summary.csv", index=False, encoding="utf-8-sig")
-    make_charts(df[df.category_code != "test"], summary)
+    df, summary = analyze_sample(read_sample(sample_path))
+    df.to_csv(output_dir / "tickets_categorized.csv", index=False, encoding="utf-8-sig")
+    summary.to_csv(output_dir / "category_summary.csv", index=False, encoding="utf-8-sig")
+    make_charts(df[df.category_code != "test"], summary, output_dir)
 
     test_count = int((df.category_code == "test").sum())
-    print(f"sample.xlsx: {len(df)} ticket ({test_count} ticket test bị loại) -> phân tích {len(df) - test_count}")
+    print(f"{sample_path.name}: {len(df)} ticket ({test_count} ticket test bị loại) -> phân tích {len(df) - test_count}")
     print(f"Người báo khác nhau: {df.reporter.nunique()} | Ticket không có thẻ: {(df.tag_count == 0).sum()}"
           f" ({(df.tag_count == 0).mean() * 100:.0f}%)")
     print("\nTheo giai đoạn:", df.stage.value_counts().to_dict())
@@ -289,13 +309,14 @@ def main() -> None:
 
     if args.week4.exists():
         w4 = analyze_week4(read_week4(args.week4))
-        w4.to_csv(OUTPUT_DIR / "week4_handling_time.csv", index=False, encoding="utf-8-sig")
+        w4.to_csv(output_dir / "week4_handling_time.csv", index=False, encoding="utf-8-sig")
         print(f"\n== Week 4: {len(w4)} ticket, thời gian từ tạo đến đóng (giờ) ==")
         print(w4[["ticket", "priority", "category", "elapsed_hours"]].to_string(index=False))
     else:
         print(f"\n[Bỏ qua Week 4] Không thấy {args.week4}")
-    print(f"\nĐã ghi kết quả vào {OUTPUT_DIR}")
+    print(f"\nĐã ghi kết quả vào {output_dir}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
