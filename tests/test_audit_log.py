@@ -44,5 +44,15 @@ def test_count_recent_login_ignores_dry_run_events(tmp_path):
     assert log.count_recent_login(now - timedelta(minutes=30)) == 1
 
 
+def test_count_recent_login_counts_each_ticket_once(tmp_path):
+    """Ticket chạy lại sau lỗi ghi log 2 lần - không được tính là 2 ticket trong ngưỡng D6."""
+    log = JsonlAuditLog(tmp_path / "a.jsonl")
+    now = datetime(2026, 10, 22, 10, 0, 0)
+    for _ in range(2):
+        log.record({"at": (now - timedelta(minutes=5)).isoformat(), "login": True, "ticket_id": 14})
+    log.record({"at": (now - timedelta(minutes=5)).isoformat(), "login": True, "ticket_id": 15})
+    assert log.count_recent_login(now - timedelta(minutes=30)) == 2
+
+
 def test_count_recent_login_without_file_is_zero(tmp_path):
     assert JsonlAuditLog(tmp_path / "missing.jsonl").count_recent_login(datetime(2026, 1, 1)) == 0

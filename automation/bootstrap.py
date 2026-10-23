@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import os
+import socket
+import uuid
 from pathlib import Path
 
 from automation.adapters.hr_http import HttpHrDirectory
 from automation.adapters.jsonl_audit_log import JsonlAuditLog
 from automation.adapters.lms_http import HttpLmsAdmin
 from automation.adapters.odoo_json2 import OdooJson2Gateway
+from automation.adapters.step_store import SqliteStepStore
 from automation.application.process_ticket import TicketProcessor
 from automation.config import Settings, load_settings, read_env_file
 
@@ -27,4 +30,6 @@ def build_processor(settings: Settings) -> TicketProcessor:
         HttpLmsAdmin(settings.lms_api_url),
         JsonlAuditLog(settings.audit_log_path),
         settings,
+        steps=SqliteStepStore(settings.state_db_path),
+        worker_id=f"{socket.gethostname()}-{os.getpid()}-{uuid.uuid4().hex[:6]}",
     )

@@ -36,10 +36,10 @@ class JsonlAuditLog:
     def count_recent_login(self, since: datetime) -> int:
         if not self.path.exists():
             return 0
-        count = 0
-        for line in self.path.read_text(encoding="utf-8").splitlines():
+        tickets: set = set()
+        for index, line in enumerate(self.path.read_text(encoding="utf-8").splitlines()):
             event = json.loads(line)
             if (event.get("login") and not event.get("dry_run") and event.get("at")
                     and datetime.fromisoformat(event["at"]) >= since):
-                count += 1
-        return count
+                tickets.add(event.get("ticket_id", f"line-{index}"))  # ticket chạy lại chỉ tính 1 lần
+        return len(tickets)

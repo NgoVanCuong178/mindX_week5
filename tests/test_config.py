@@ -13,6 +13,8 @@ def test_loads_required_and_default_values():
     assert settings.incident_threshold == 5
     assert settings.team_name == "MindX Tech Support"
     assert settings.odoo_lang == "vi_VN"
+    assert settings.state_db_path == Path("logs/state.db")
+    assert settings.claim_lease_seconds == 600
 
 
 def test_overrides_from_env():

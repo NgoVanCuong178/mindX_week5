@@ -1,6 +1,7 @@
 """Ports (interface) giữa lõi nghiệp vụ và hệ thống bên ngoài - kiến trúc hexagonal."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 
@@ -9,6 +10,22 @@ from automation.domain.models import Employee, LmsAccount, Ticket
 
 class ExternalServiceError(Exception):
     """Hệ thống bên ngoài (Odoo, HR, LMS) lỗi sau khi đã thử lại."""
+
+
+@dataclass(frozen=True)
+class StepRecord:
+    status: str               # "started" (đang làm / bị gián đoạn) hoặc "done"
+    result: str | None = None  # kết quả cần dùng lại, ví dụ link đặt lại mật khẩu, quyết định đã lưu
+
+
+class StepStore(Protocol):
+    """Sổ ghi trạng thái từng bước + quyền xử lý ticket - chống làm lại khi chạy lại hoặc chạy song song."""
+    def claim(self, ticket_id: int, worker: str, lease_seconds: int) -> bool: ...
+    def release(self, ticket_id: int, worker: str) -> None: ...
+    def get(self, ticket_id: int, step: str) -> StepRecord | None: ...
+    def start(self, ticket_id: int, step: str) -> None: ...
+    def complete(self, ticket_id: int, step: str, result: str | None = None) -> None: ...
+    def clear(self, ticket_id: int, step: str) -> None: ...
 
 
 class TicketGateway(Protocol):

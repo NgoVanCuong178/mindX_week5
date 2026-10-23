@@ -19,6 +19,8 @@ class Settings:
     incident_threshold: int = 5
     incident_window_minutes: int = 30
     audit_log_path: Path = Path("logs/automation.jsonl")
+    state_db_path: Path = Path("logs/state.db")
+    claim_lease_seconds: int = 600
     webhook_token: str = ""
 
 
@@ -41,6 +43,8 @@ def load_settings(env: dict[str, str]) -> Settings:
         incident_threshold=int(env.get("INCIDENT_THRESHOLD", defaults.incident_threshold)),
         incident_window_minutes=int(env.get("INCIDENT_WINDOW_MINUTES", defaults.incident_window_minutes)),
         audit_log_path=Path(env.get("AUDIT_LOG_PATH", defaults.audit_log_path)),
+        state_db_path=Path(env.get("STATE_DB_PATH", defaults.state_db_path)),
+        claim_lease_seconds=int(env.get("CLAIM_LEASE_SECONDS", defaults.claim_lease_seconds)),
         webhook_token=env.get("WEBHOOK_TOKEN", defaults.webhook_token),
     )
 
