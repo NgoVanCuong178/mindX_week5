@@ -11,11 +11,12 @@ Viết theo chu trình RED → GREEN → REFACTOR, mỗi bước một commit:
 | `test(automation): add failing tests ...` | RED – chỉ viết test + khung `NotImplementedError` | 116 failed, 12 errors |
 | `feat(automation): implement ...` | GREEN – code tối thiểu | 128 passed |
 | `refactor(automation): ...` | REFACTOR – tách retry, tách bước xử lý | 128 passed (không đổi hành vi) |
-| Các commit `fix(...)`, `feat(...)` sau E2E | Lỗi phát hiện khi chạy thật và lệnh chạy webhook – mỗi thay đổi: test fail trước → sửa | **136 passed** |
+| Các commit `fix(...)`, `feat(...)` sau E2E | Lỗi phát hiện khi chạy thật và lệnh chạy webhook – mỗi thay đổi: test fail trước → sửa | 136 passed |
+| Sau review mentor | Chống xử lý trùng (35 test mới fail trước → sửa) và chạy lại script phân tích bằng dữ liệu mẫu ẩn danh (6 test) | **175 passed** |
 
 ```
 pytest -o addopts="" -q
-136 passed
+175 passed
 ```
 
 | Nhóm test | Nội dung chính |
@@ -24,6 +25,8 @@ pytest -o addopts="" -q
 | Application | Chuỗi hành động từng nhánh với adapter giả, thứ tự LMS trước Odoo, dry-run, không xử lý trùng, guard sự cố |
 | Adapters | Odoo JSON-2 (header, domain, `body_is_html`, `context.lang`), HR/LMS (retry, timeout, 404), audit log (che email) |
 | Entrypoints, mock | Poller (`--once`, vòng lặp chịu lỗi), webhook (token), mock HR/LMS (khoá sau 30 ngày) |
+| Chống xử lý trùng | Ghi chú/thẻ lỗi rồi chạy lại: mỗi hành động 1 lần, giữ quyết định và link cũ; email/link bị gián đoạn không làm lại; 2 worker song song chỉ 1 worker hành động (ổn định 20/20 lần chạy) |
+| Phân tích | Phân nhóm tái hiện được trên dữ liệu mẫu ẩn danh; thiếu `--sample` báo hướng dẫn |
 
 ## 2. Lỗi tìm ra nhờ chạy thật
 
@@ -33,6 +36,7 @@ pytest -o addopts="" -q
 | Lượt dry-run bị đếm vào ngưỡng sự cố D6 | Khi lên kịch bản E2E | Bỏ sự kiện dry-run khi đếm |
 | Poller không thấy ticket nào: API trả tên giai đoạn tiếng Anh (`New`), code tìm `Mới` | Chạy E2E lần đầu | Gửi `context: {lang: vi_VN}` trong mọi request (`ODOO_LANG`) |
 | Ticket thứ 2 cùng lượt bị đếm 2 lần ("3 ticket" thay vì 2) | E9 | Đếm log 1 lần trước mỗi lượt |
+| Ghi chú Odoo lỗi → lượt sau gửi 2 email, kích hoạt LMS 2 lần, tạo 2 link | Review mentor | Sổ ghi trạng thái từng bước + claim (SQLite); bước gián đoạn không lặp, chuyển người kiểm tra |
 | Ghi chú liệt kê từ khoá trùng ý (`password` trong `invalid username or password`) | E1 | Bỏ từ khoá nằm trong từ khoá dài hơn |
 
 ## 3. Kiểm thử end-to-end trên Odoo
@@ -79,7 +83,7 @@ pytest -o addopts="" -q
 |---|---|---|
 | Thời gian xử lý một ticket đăng nhập | 10–16 phút khi làm liền mạch; có ca 23,6 giờ (#00001, phản hồi trễ) | ~2–3 giây mỗi ticket (theo log) + tối đa 1 chu kỳ quét (2 phút) |
 | Thao tác của support | Tra HR, tra LMS, kích hoạt, tạo link, viết email, ghi chú, đổi thẻ/giai đoạn | 0 với D1/D2; đọc ghi chú có sẵn với D3–D6 |
-| Tỉ lệ tự động xử lý (E2E, ticket đăng nhập LMS hợp lệ E1–E4) | 0% | 2/4 hoàn tất tự động (D1, D2); 2/4 chuyển người kèm phản hồi ngay (D3, D4) |
+| Kết quả trên 4 ca đăng nhập LMS E2E (E1–E4, dữ liệu mock) | – | 2/4 hoàn tất tự động (D1, D2); 2/4 chuyển người kèm phản hồi ngay – minh hoạ hành vi, **không** phải tỉ lệ trên ticket thật (xem pattern-analysis mục 5) |
 | Tuân thủ SLA phản hồi 30 phút (Standard) | Phụ thuộc người trực | Luôn đạt (phản hồi trong chu kỳ quét) |
 
 ## 5. Giới hạn đã biết

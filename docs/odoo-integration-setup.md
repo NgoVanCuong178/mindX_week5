@@ -30,7 +30,7 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env      # rồi điền giá trị thật
-pytest -o addopts="" -q     # kỳ vọng: 136 passed
+pytest -o addopts="" -q     # kỳ vọng: 175 passed
 ```
 
 **`.env`:**
@@ -47,6 +47,8 @@ pytest -o addopts="" -q     # kỳ vọng: 136 passed
 | `POLL_INTERVAL_SECONDS` | không | `120` | chu kỳ quét |
 | `INCIDENT_THRESHOLD`, `INCIDENT_WINDOW_MINUTES` | không | `5`, `30` | guard sự cố D6 |
 | `AUDIT_LOG_PATH` | không | `logs/automation.jsonl` | log quyết định (email đã che) |
+| `STATE_DB_PATH` | không | `logs/state.db` | sổ ghi trạng thái từng bước + claim (chống xử lý trùng); giữ nguyên file giữa các lần chạy |
+| `CLAIM_LEASE_SECONDS` | không | `600` | thời hạn một worker giữ quyền xử lý một ticket |
 | `WEBHOOK_TOKEN` | không | – | bí mật cho webhook (mục 6) |
 
 ## 4. Chạy
@@ -109,4 +111,5 @@ Khi cài module **Quy tắc tự động hoá** (`base_automation`) trên Odoo:
 | `Không tìm thấy helpdesk.tag trên Odoo: ...` | Chưa tạo đủ 6 thẻ (mục 2) |
 | Nhiều ticket ra D5 | HR/LMS không chạy hoặc sai URL – kiểm tra `HR_API_URL`, `LMS_API_URL` |
 | Ticket ra D6 hàng loạt | Đúng thiết kế khi ≥ `INCIDENT_THRESHOLD` ticket đăng nhập trong 30 phút hoặc LMS lỗi – kiểm tra monitoring trước khi tăng ngưỡng |
-| Muốn xử lý lại một ticket | Gỡ thẻ `auto-processed`, đưa về *Mới* |
+| Muốn xử lý lại một ticket | Gỡ thẻ `auto-processed`, đưa về *Mới* **và** xoá trạng thái của ticket trong `logs/state.db` (bảng `steps`, `ticket_id = <id>`) |
+| Ticket có cảnh báo "bị gián đoạn" + `needs-review` | Một bước tạo link/gửi email lỗi giữa chừng ở lượt trước; kiểm tra chatter rồi xử lý tay – workflow cố ý không làm lại |

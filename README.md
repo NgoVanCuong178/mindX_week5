@@ -10,8 +10,8 @@ Phân tích ticket Helpdesk để tìm vấn đề lặp lại, và xây workflo
 | Phát hiện + khuyến nghị có số liệu | Top 5 với tỉ lệ, số người báo, giờ công; 6 phát hiện chất lượng dữ liệu | [pattern-analysis.md](docs/pattern-analysis.md) |
 | Workflow tự động cho Scenario 1 | Phân loại → kiểm tra HR → kích hoạt lại / ghi chú → email → log; bảng quyết định D1–D7 | [automation-design.md](docs/automation-design.md) |
 | Tích hợp Odoo (API) | External JSON-2 API; trigger quét định kỳ (Task Scheduler), webhook sẵn sàng | [odoo-integration-setup.md](docs/odoo-integration-setup.md) |
-| Kiểm thử | 136 test (TDD) · 9/9 ca end-to-end trên Odoo thật | [test-evidence.md](docs/test-evidence.md) |
-| Kế hoạch giảm ticket | 9 hành động, mục tiêu −25% ticket xử lý tay trong 8 tuần | [action-plan.md](docs/action-plan.md) |
+| Kiểm thử | 175 test (TDD), gồm chống xử lý trùng khi chạy lại và chạy song song · 9/9 ca end-to-end trên Odoo thật | [test-evidence.md](docs/test-evidence.md) |
+| Kế hoạch giảm ticket | Top 3 vấn đề → 15 action item (mỗi item 1 hành động, 1 chỉ số có baseline, 1 hạn chót, DoD) trong 8 tuần | [action-plan.md](docs/action-plan.md) |
 | Tư duy Operating Engineer | Tự động hoá vs sửa code, khi nào chuyển dev, ranh giới escalate | [automation-design.md – mục 2](docs/automation-design.md#vì-sao-tự-động-hoá-thay-vì-sửa-code) |
 | Knowledge base | Bài KB cho support (đã đăng trên Odoo Kiến thức) | [kb-login-automation.md](docs/kb-login-automation.md) |
 
@@ -43,7 +43,7 @@ automation/
   bootstrap.py, config.py, ports.py
 mock_services/         mock HR + LMS (FastAPI, quy tắc khoá sau 30 ngày)
 scripts/               kiểm tra kết nối Odoo, spike ghi thử, run_poller.ps1 cho Task Scheduler
-tests/                 136 test (pytest)
+tests/                 175 test (pytest); fixtures/ chứa dữ liệu mẫu ẩn danh
 docs/                  tài liệu Week 5
 images/                ảnh báo cáo Odoo và kiểm thử end-to-end
 ```
@@ -55,12 +55,13 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env                       # điền ODOO_URL, ODOO_API_KEY
-pytest -o addopts="" -q                      # 136 passed
+pytest -o addopts="" -q                      # 175 passed
 
 uvicorn mock_services.app:app --port 8001    # terminal 1: mock HR + LMS
 python -m automation.entrypoints.poller --once --dry-run   # terminal 2: xem quyết định, không ghi
 python -m automation.entrypoints.poller --once             # chạy thật một lượt
-python analysis/analyze_tickets.py           # phân tích lại dữ liệu ticket
+python analysis/analyze_tickets.py --sample tests/fixtures/sample_anonymized.xlsx   # dữ liệu mẫu ẩn danh
+python analysis/analyze_tickets.py --sample <đường dẫn sample.xlsx>               # dữ liệu thật (không commit)
 ```
 
 Chi tiết: [odoo-integration-setup.md](docs/odoo-integration-setup.md).

@@ -41,7 +41,7 @@ Nguyên nhân gốc là quy tắc **tự vô hiệu hoá tài khoản sau 30 ng�
 
 | Tiêu chí | Ticket đăng nhập |
 |---|---|
-| Lặp lại thường xuyên | 14/121 ticket (11,6%); 18,2% nếu gộp nhóm truy cập tài khoản |
+| Lặp lại thường xuyên | Nhóm đăng nhập 14/121 (11,6%), trong đó LMS – phạm vi hiện tại – 5/121; 18,2% nếu gộp nhóm truy cập tài khoản |
 | Xử lý tay hiệu quả nhưng tốn thời gian | 4 bước cố định, 5–10 phút mỗi ticket |
 | Sửa gốc cần đổi code | Quy tắc khoá 30 ngày trong LMS |
 | Cần giải pháp ngay | Giáo viên cần tài liệu cho buổi dạy trong ngày |
@@ -206,7 +206,10 @@ Ticket #{ref}
 
 | Rủi ro | Biện pháp |
 |---|---|
-| Xử lý một ticket hai lần | Thẻ `auto-processed` + kiểm tra log trước khi xử lý; mọi thao tác ghi Odoo làm cuối cùng |
+| Xử lý một ticket hai lần khi chạy lại sau lỗi | **Sổ ghi trạng thái từng bước** (`logs/state.db`, SQLite): bước đã xong (`lms_reactivate`, `lms_reset_link`, `email`, `note`, `tags`, `stage`) không làm lại; quyết định và link đặt lại mật khẩu được lưu và dùng lại – lượt chạy lại không đổi D1 thành D2 dù LMS đã báo `active` |
+| Bước không được lặp bị gián đoạn (tạo link, gửi email lỗi giữa chừng – có thể đã thực hiện) | Không làm lại; thêm thẻ `needs-review`, ghi chú cảnh báo, chuyển *Đang thực hiện* để người kiểm tra. Các bước lặp được an toàn (kích hoạt lại, ghi chú, thẻ, giai đoạn) lỗi thì thử lại ở lượt sau |
+| Hai worker cùng xử lý một ticket (2 poller, hoặc poller + webhook) | **Claim** có thời hạn (`CLAIM_LEASE_SECONDS`, mặc định 10 phút) trong SQLite, giành bằng giao dịch `BEGIN IMMEDIATE`; worker không giành được thì bỏ qua; claim tự nhả khi xong hoặc lỗi |
+| Ticket đã hoàn tất nhưng thẻ chưa ghi được | Thẻ `auto-processed` (lọc khi đọc ticket) **và** bản ghi hoàn tất trong sổ trạng thái |
 | Kích hoạt nhầm tài khoản | Chỉ khi email người báo = email HR = email LMS; độ tin cậy `high`; lý do khoá = không hoạt động |
 | Mở lại tài khoản người đã nghỉ | HR là nguồn quyết định; `terminated` không bao giờ kích hoạt lại |
 | Sự cố hệ thống bị xử lý như lỗi cá nhân | Guard D6: ngưỡng số ticket + LMS health check |
@@ -216,21 +219,25 @@ Ticket #{ref}
 
 ## 10. Đo lường (trước / sau)
 
-| Chỉ số | Trước (thủ công) | Mục tiêu |
-|---|---|---|
-| Thời gian phản hồi đầu tiên ticket đăng nhập | đến 30 phút (SLA), thực tế Week 4: 10–16 phút, có ca 23 giờ | ≤ 2 phút (chu kỳ quét) |
-| Thời gian thao tác của support mỗi ticket | 5–10 phút | 0 phút với D1/D2; chỉ xem ghi chú với D3–D6 |
-| Tỉ lệ tự động hoá (D1+D2 / tổng ticket đăng nhập LMS) | 0% | ≥ 70% |
-| Ticket tự động bị mở lại / phản hồi "vẫn lỗi" | – | < 5% |
+Phạm vi và mẫu số (chi tiết: [pattern-analysis.md](pattern-analysis.md) mục 5): workflow hiện chỉ xử lý **lỗi đăng nhập LMS/Denise** – 5/121 ticket trong mẫu, trong đó 2 ticket đủ điều kiện theo tiêu đề. TMS, ECount, CRM, email (9 ticket) là phạm vi mở rộng, **không** tính vào mục tiêu.
 
-Số liệu lấy từ `logs/automation.jsonl` và báo cáo Odoo lọc theo thẻ `auto-*`.
+| Chỉ số | Định nghĩa | Trước (nguồn) | Mục tiêu |
+|---|---|---|---|
+| Thời gian phản hồi đầu | Tạo ticket → phản hồi đầu, ticket đăng nhập LMS | 10–16 phút, có ca 23,6 giờ (Week 4, 3 ticket, đo được) | ≤ 2 phút với ticket đủ điều kiện |
+| Độ phủ | Ticket workflow xử lý (D1–D6) / ticket đăng nhập LMS | Chưa chạy thật | Báo cáo theo tuần (action plan A4) |
+| Tỉ lệ tự xử lý | (D1 + D2) / ticket đủ điều kiện | Chưa chạy thật | ≥ 70% sau 4 tuần |
+| Thao tác support | Thời gian support bỏ ra cho mỗi ticket đủ điều kiện | 5–10 phút (đề bài) | 0 với D1/D2; đọc ghi chú với D3–D6 |
+| Mở lại | Ticket tự động bị phản hồi "vẫn lỗi" | – | < 5% |
+
+Số liệu "sau" lấy từ `logs/automation.jsonl` và báo cáo Odoo lọc theo thẻ `auto-*`. Tác động lên tổng số ticket dự kiến nhỏ; chỉ kết luận sau 4 tuần đo thật.
 
 ## 11. Chiến lược kiểm thử (TDD)
 
 | Mức | Nội dung |
 |---|---|
 | Unit – domain | Classifier với tiêu đề thật từ `sample.xlsx` (14 ticket đăng nhập, các ticket loại trừ); bảng quyết định đủ D1–D7 và các biên (email lệch, lý do khoá khác) |
-| Service | `process_ticket` với adapter giả: đúng chuỗi hành động từng nhánh, idempotent, retry rồi D5, guard D6 |
+| Service | `process_ticket` với adapter giả: đúng chuỗi hành động từng nhánh, retry rồi D5, guard D6 |
+| Chống xử lý trùng | `tests/test_idempotency.py`: ghi chú/thẻ lỗi rồi chạy lại → mỗi hành động 1 lần, giữ quyết định và link cũ; email/link bị gián đoạn → không làm lại, chuyển `needs-review`; 2 worker song song (SQLite thật) → chỉ 1 worker hành động; `tests/test_step_store.py` cho claim và sổ trạng thái |
 | Integration | Adapter HR/LMS gọi `mock_services` thật; adapter Odoo kiểm tra request/response JSON-2 |
 | End-to-end | 7 ca trên Odoo thật (Giai đoạn 5): D1, D2, D3, D4, ticket không liên quan, tắt mock HR, chạy lại không xử lý trùng |
 
